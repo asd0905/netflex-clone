@@ -1,16 +1,16 @@
 import styled from "styled-components";
-import { motion, useAnimation } from "framer-motion";
-import {Link, useMatch, useNavigate} from 'react-router-dom';
-import {useState} from 'react';
+import { motion, useAnimation, useScroll } from "framer-motion";
+import {Link, useMatch} from 'react-router-dom';
+import {useEffect, useState} from 'react';
 
-const SNav = styled.nav`
+const SNav = styled(motion.nav)`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	position: fixed;
 	width: 100%;
 	top: 0;
-	background-color: #000;
+	//background-color: #000;
 	height: 80px;
 	font-size: 14px;
 	color: #fff;
@@ -123,10 +123,10 @@ const inputVariants = (searchOpen: boolean) => {
 const searchSvgVariants = (searchOpen: boolean) => {
 	return {
 		initial: {
-			x: 0,
+			left: 0,
 		},
 		animate: {
-			x: searchOpen ? -210: 0,
+			left: searchOpen ? -210: 0,
 			transition: {
 				ease: 'linear',
 				duration: 0.8,
@@ -138,16 +138,50 @@ const searchSvgVariants = (searchOpen: boolean) => {
 	}
 }
 
+const navVariants = {
+	top: {
+		backgroundColor: 'rgba(0, 0, 0, 0)',
+	},
+	scroll: {
+		backgroundColor: 'rgba(0, 0, 0, 1)'
+	}
+}
+
 function Header() {
 	const [searchOpen, setSearchOpen] = useState(false);
 	const homeMatch = useMatch("/");
 	const tvMatch = useMatch("/tv");
-	const inputAnimation = useNavigate();
 	// console.log("homeMatch", homeMatch);
 	// console.log("tvMatch", tvMatch);
-	const toogleSearch = () => setSearchOpen(prev => !prev);
+	const inputAnimation = useAnimation();
+	const navAnimation = useAnimation();
+	const toggleSearch = () => {
+		if (searchOpen) {
+			inputAnimation.start({
+				scaleX: 0,
+			});
+		} else {
+			inputAnimation.start({scaleX: 1});
+		}
+		setSearchOpen(prev => !prev);
+	};
+	const {scrollY} = useScroll();
+	useEffect(() => {
+		scrollY.on('change', () => {
+			// console.log(scrollY.get());
+            if (scrollY.get() > 80) {
+				navAnimation.start('scroll')
+			} else {
+				navAnimation.start('top')
+			}
+		})
+	}, [scrollY, navAnimation])
 	return (
-		<SNav>
+		<SNav
+			variants={navVariants}
+			animate={navAnimation}
+			initial={'top'}
+		>
 			<SCol>
 				<SLogo
 					variants={logoVariants}
@@ -172,7 +206,7 @@ function Header() {
 			<SCol>
 				<SSearch>
 					<motion.svg
-						onClick={toogleSearch}
+						onClick={toggleSearch}
 						variants={searchSvgVariants(searchOpen)}
 						initial='initial'
 						animate='animate'
@@ -187,10 +221,12 @@ function Header() {
 						></path>
 					</motion.svg>
 					<SInput
-						// animate={inputAnimation}
-						variants={inputVariants(searchOpen)}
-						initial='initial'
-						animate='animate'
+						animate={inputAnimation}
+						initial={{scaleX: 0}}
+						transition={{ease: 'linear'}}
+						// variants={inputVariants(searchOpen)}
+						// initial='initial'
+						// animate='animate'
 						placeholder={'검색해주세요.'}
 					/>
 				</SSearch>
