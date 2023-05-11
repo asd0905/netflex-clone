@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
-import { Link, useMatch } from "react-router-dom";
+import { motion, useAnimation } from "framer-motion";
+import {Link, useMatch, useNavigate} from 'react-router-dom';
+import {useState} from 'react';
 
 const SNav = styled.nav`
 	display: flex;
@@ -40,7 +41,7 @@ const SItems = styled.ul`
 const SItem = styled.li`
 	margin-right: 20px;
 	color: ${(props) => props.theme.white.darker};
-	transition: color 0.3 ease-in-out;
+	//transition: color 0.3s 'ease-in-out';
 	position: relative;
 	display: flex;
 	justify-content: center;
@@ -53,7 +54,7 @@ const SItem = styled.li`
 	}
 `;
 
-const SCirle = styled.span`
+const SCirle = styled(motion.span)`
 	position: absolute;
 	width: 5px;
 	height: 5px;
@@ -67,9 +68,26 @@ const SCirle = styled.span`
 
 const SSearch = styled.span`
 	color: white;
-	height: 25px;
 	display: flex;
 	justify-content: flex-end;
+	align-items: center;
+	position: relative;
+	svg {
+		height: 25px;
+	}
+`;
+
+const SInput = styled(motion.input)`
+	transform-origin: right center;
+	position: absolute;
+	right: 0;
+	padding: 5px 10px;
+	padding-left: 40px;
+	z-index: -1;
+	color: white;
+	font-size: 16px;
+	background-color: transparent;
+	border: 1px solid ${(props) => props.theme.white.lighter};
 `;
 
 const logoVariants = {
@@ -84,11 +102,50 @@ const logoVariants = {
 	},
 };
 
+const inputVariants = (searchOpen: boolean) => {
+	return {
+		initial: {
+			scaleX: 0,
+		},
+		animate: {
+			scaleX: searchOpen ? 1: 0,
+			transition: {
+				ease: 'linear',
+				duration: 0.8,
+			}
+		},
+		exit: {
+
+		}
+	}
+}
+
+const searchSvgVariants = (searchOpen: boolean) => {
+	return {
+		initial: {
+			x: 0,
+		},
+		animate: {
+			x: searchOpen ? -210: 0,
+			transition: {
+				ease: 'linear',
+				duration: 0.8,
+			}
+		},
+		exit: {
+
+		}
+	}
+}
+
 function Header() {
+	const [searchOpen, setSearchOpen] = useState(false);
 	const homeMatch = useMatch("/");
 	const tvMatch = useMatch("/tv");
-	console.log("homeMatch", homeMatch);
-	console.log("tvMatch", tvMatch);
+	const inputAnimation = useNavigate();
+	// console.log("homeMatch", homeMatch);
+	// console.log("tvMatch", tvMatch);
+	const toogleSearch = () => setSearchOpen(prev => !prev);
 	return (
 		<SNav>
 			<SCol>
@@ -105,16 +162,20 @@ function Header() {
 				</SLogo>
 				<SItems>
 					<SItem>
-						<Link to='/'>Home {homeMatch && <SCirle />}</Link>
+						<Link to='/'>Home {homeMatch && <SCirle layoutId={'cirlce'} />}</Link>
 					</SItem>
 					<SItem>
-						<Link to='/tv'>Tv Shows {tvMatch && <SCirle />}</Link>
+						<Link to='/tv'>Tv Shows {tvMatch && <SCirle layoutId={'cirlce'} />}</Link>
 					</SItem>
 				</SItems>
 			</SCol>
 			<SCol>
 				<SSearch>
-					<svg
+					<motion.svg
+						onClick={toogleSearch}
+						variants={searchSvgVariants(searchOpen)}
+						initial='initial'
+						animate='animate'
 						fill='currentColor'
 						viewBox='0 0 20 20'
 						xmlns='http://www.w3.org/2000/svg'
@@ -124,7 +185,14 @@ function Header() {
 							d='M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z'
 							clipRule='evenodd'
 						></path>
-					</svg>
+					</motion.svg>
+					<SInput
+						// animate={inputAnimation}
+						variants={inputVariants(searchOpen)}
+						initial='initial'
+						animate='animate'
+						placeholder={'검색해주세요.'}
+					/>
 				</SSearch>
 			</SCol>
 		</SNav>
