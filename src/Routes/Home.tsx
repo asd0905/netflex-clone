@@ -3,6 +3,7 @@ import { IGetMoviesResult, getMovies } from "../api";
 import styled from "styled-components";
 import { Suspense } from "react";
 import { makeImagePath } from "../utills";
+import { motion } from "framer-motion";
 
 const SWrapper = styled.div`
 	background-color: black;
@@ -36,6 +37,10 @@ const SOverView = styled.p`
 	width: 50%;
 `;
 
+const SSlider = styled.div``;
+
+const SRow = styled(motion.div)``;
+
 function MovieBanner() {
 	const { data, isLoading } = useQuery<IGetMoviesResult>(
 		["movies", "nowPlaying"],
@@ -47,10 +52,20 @@ function MovieBanner() {
 	console.log(data, isLoading);
 	return (
 		<>
-			<SBanner bhPhoto={makeImagePath(data?.results[1].backdrop_path || "")}>
-				<STitle>{data?.results[1].title}</STitle>
-				<SOverView>{data?.results[1].overview}</SOverView>
+			<SBanner bhPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
+				<STitle>{data?.results[0].title}</STitle>
+				<SOverView>{data?.results[0].overview}</SOverView>
 			</SBanner>
+			<SSlider>
+				<SRow>
+					<SBox />
+					<SBox />
+					<SBox />
+					<SBox />
+					<SBox />
+					<SBox />
+				</SRow>
+			</SSlider>
 		</>
 	);
 }
