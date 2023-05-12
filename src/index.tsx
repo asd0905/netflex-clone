@@ -6,6 +6,9 @@ import { ThemeProvider, createGlobalStyle } from "styled-components";
 import { RecoilRoot } from "recoil";
 import { theme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -25,10 +28,12 @@ root.render(
 	<React.StrictMode>
 		<BrowserRouter>
 			<RecoilRoot>
-				<ThemeProvider theme={theme}>
-					<GlobalStyle />
-					<App />
-				</ThemeProvider>
+				<QueryClientProvider client={queryClient}>
+					<ThemeProvider theme={theme}>
+						<GlobalStyle />
+						<App />
+					</ThemeProvider>
+				</QueryClientProvider>
 			</RecoilRoot>
 		</BrowserRouter>
 	</React.StrictMode>
