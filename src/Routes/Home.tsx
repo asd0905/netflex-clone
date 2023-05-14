@@ -10,7 +10,7 @@ const SWrapper = styled.div`
 	overflow-x: hidden;
 `;
 
-const Loading = styled.div`
+const SLoading = styled.div`
 	height: 20vh;
 	display: flex;
 	justify-content: center;
@@ -68,6 +68,22 @@ const SBox = styled(motion.div)<{ bgphoto: string }>`
 	}
 `;
 
+const SInfo = styled(motion.div)`
+	padding: 10px;
+	background-color: ${(props) => props.theme.black.lighter};
+	opacity: 0;
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.8);
+	h4 {
+		font-size: 14px;
+		text-align: center;
+		color: #ffffff;
+		font-weight: normal;
+	}
+`;
+
 const rowVariants = {
 	hidden: {
 		x: document.body.clientWidth + 5,
@@ -95,6 +111,17 @@ const boxVariants = {
 	},
 	blur: {
 		transition: {
+			type: "tween",
+		},
+	},
+};
+
+const infoVariants = {
+	hover: {
+		opacity: 1,
+		transition: {
+			delay: 0.5,
+			duration: 0.3,
 			type: "tween",
 		},
 	},
@@ -157,7 +184,11 @@ function MovieBanner() {
 										movie.backdrop_path || movie.poster_path,
 										"w500"
 									)}
-								></SBox>
+								>
+									<SInfo variants={infoVariants}>
+										<h4>{movie.title}</h4>
+									</SInfo>
+								</SBox>
 							))}
 					</SRow>
 				</AnimatePresence>
@@ -169,7 +200,7 @@ function MovieBanner() {
 function Home() {
 	return (
 		<SWrapper>
-			<Suspense fallback={<Loading>Loading...</Loading>}>
+			<Suspense fallback={<SLoading>Loading...</SLoading>}>
 				<MovieBanner></MovieBanner>
 			</Suspense>
 		</SWrapper>
