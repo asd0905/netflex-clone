@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Suspense, useState } from "react";
 import { makeImagePath } from "../utills";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMatch, useNavigate } from "react-router-dom";
 
 const SWrapper = styled.div`
 	background-color: black;
@@ -60,6 +61,7 @@ const SBox = styled(motion.div)<{ bgphoto: string }>`
 	background-image: url(${(props) => props.bgphoto});
 	background-size: cover;
 	background-position: center center;
+	cursor: pointer;
 	&:first-child {
 		transform-origin: center left;
 	}
@@ -130,6 +132,8 @@ const infoVariants = {
 const offset = 6;
 
 function MovieBanner() {
+	const navigation = useNavigate();
+	const bigMovieMatch = useMatch("/movies/:movieId");
 	const { data, isLoading } = useQuery<IGetMoviesResult>(
 		["movies", "nowPlaying"],
 		getMovies,
@@ -151,6 +155,9 @@ function MovieBanner() {
 		}
 	};
 	const toggleLeaving = () => setLeaving((prev) => !prev);
+	const handleBoxClick = (movieId: number) => {
+		navigation(`/movies/${movieId}`);
+	};
 	return (
 		<>
 			<SBanner
@@ -176,10 +183,14 @@ function MovieBanner() {
 							.map((movie) => (
 								<SBox
 									key={movie.id}
+									layoutId={movie.id + ""}
 									variants={boxVariants}
 									whileHover={"hover"}
 									initial={"normal"}
 									transition={{ type: "tween" }}
+									onClick={() => {
+										handleBoxClick(movie.id);
+									}}
 									bgphoto={makeImagePath(
 										movie.backdrop_path || movie.poster_path,
 										"w500"
@@ -193,6 +204,23 @@ function MovieBanner() {
 					</SRow>
 				</AnimatePresence>
 			</SSlider>
+			<AnimatePresence>
+				{bigMovieMatch ? (
+					<motion.div
+						layoutId={bigMovieMatch.params.movieId}
+						style={{
+							position: "absolute",
+							width: "40vw",
+							height: "80vh",
+							backgroundColor: "pink",
+							top: 10,
+							left: 0,
+							right: 0,
+							margin: "0 auto",
+						}}
+					></motion.div>
+				) : null}
+			</AnimatePresence>
 		</>
 	);
 }
